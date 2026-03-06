@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kiến thức Ngữ Văn THPT 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; background: #0d0d1a; color: #ddd8ee; min-height: 100vh; }
+    .tabs-scroll { display: flex; gap: 7px; overflow-x: auto; padding: 14px 0 0; }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+    .tab-btn { padding: 7px 13px; border-radius: 99px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-family: 'Be Vietnam Pro', sans-serif; }
+    .item-row { cursor: pointer; transition: background 0.12s; }
+    .item-row:hover { background: rgba(255,255,255,0.04); }
+    .section-box { margin-bottom: 14px; background: rgba(255,255,255,0.03); border: 1px solid #1e1e40; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 11px 16px; border-bottom: 1px solid #1e1e40; background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+    .item-inner { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .item-body { padding: 0 16px 14px 16px; }
+    .def-box { font-size: 13px; line-height: 1.7; color: #9090b8; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 10px; }
+    .note-label { font-size: 11px; font-weight: 600; color: #46467a; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+    .note-textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid #2a2a55; border-radius: 8px; padding: 9px 12px; color: #ddd8ee; font-size: 13px; font-family: 'Be Vietnam Pro', sans-serif; resize: vertical; min-height: 72px; outline: none; line-height: 1.6; transition: border 0.2s; }
+    .note-textarea:focus { border-color: #a78bfa; }
+    .note-textarea::placeholder { color: #30305a; }
+    .note-saved { font-size: 11px; color: #4ade80; margin-top: 5px; opacity: 0; transition: opacity 0.3s; }
+    .note-saved.show { opacity: 1; }
+    .item-divider { border-bottom: 1px solid #191932; }
+    input[type=text] { font-family: 'Be Vietnam Pro', sans-serif; }
+    input[type=text]::placeholder { color: #404060; }
+    .search-box { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid #1e1e40; border-radius: 8px; padding: 9px 14px; color: #ddd8ee; font-size: 13px; outline: none; margin: 12px 0 14px; transition: border 0.2s; }
+    .search-box:focus { border-color: #a78bfa; }
+    .badge { border-radius: 99px; padding: 1px 7px; font-size: 10px; font-weight: 700; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transition: background 0.2s; }
+    .arrow { font-size: 12px; color: #34345a; transition: transform 0.25s; flex-shrink: 0; display: inline-block; }
+    .arrow.open { transform: rotate(180deg); }
+    .has-note-dot { width: 5px; height: 5px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; margin-left: 2px; }
+    .empty { text-align: center; color: #28284a; padding: 44px; font-size: 13px; }
+    .notes-count { font-size: 11px; color: #fbbf24; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const data = [
+  {
+    id: "tiengviet", label: "Tiếng Việt", icon: "🔤", color: "#4ade80",
+    sections: [
+      {
+        title: "Phương thức biểu đạt",
+        items: [
+          { term: "Tự sự", def: "Kể lại sự việc, câu chuyện theo trình tự" },
+          { term: "Miêu tả", def: "Tái hiện đặc điểm, hình dáng sự vật, con người, cảnh vật" },
+          { term: "Biểu cảm", def: "Bộc lộ cảm xúc, thái độ, tình cảm của người viết" },
+          { term: "Nghị luận", def: "Trình bày ý kiến, lập luận để thuyết phục người đọc" },
+          { term: "Thuyết minh", def: "Giới thiệu, giải thích đặc điểm, tính chất sự vật hiện tượng" },
+          { term: "Hành chính – công vụ", def: "Văn bản giao tiếp trong các tình huống hành chính, pháp lý" },
+        ]
+      },
+      {
+        title: "Phong cách ngôn ngữ",
+        items: [
+          { term: "Sinh hoạt", def: "Dùng trong giao tiếp hàng ngày, tự nhiên, giàu cảm xúc" },
+          { term: "Nghệ thuật", def: "Dùng trong văn học, giàu hình ảnh, cảm xúc, đa nghĩa" },
+          { term: "Báo chí", def: "Thông tin thời sự, ngắn gọn, rõ ràng, cập nhật" },
+          { term: "Khoa học", def: "Chính xác, logic, trung tính, dùng thuật ngữ chuyên ngành" },
+          { term: "Chính luận", def: "Trình bày quan điểm chính trị, xã hội, lập luận chặt chẽ" },
+          { term: "Hành chính", def: "Khuôn mẫu, chính xác, dùng trong văn bản nhà nước" },
+        ]
+      },
+      {
+        title: "Biện pháp tu từ về TỪ",
+        items: [
+          { term: "So sánh", def: "Đối chiếu A với B có nét tương đồng → gợi hình ảnh sinh động (VD: 'Mặt trời như hòn lửa')" },
+          { term: "Ẩn dụ", def: "Gọi A bằng tên B vì có nét tương đồng (ngầm, không dùng 'như') → hàm súc, gợi liên tưởng sâu" },
+          { term: "Hoán dụ", def: "Gọi A bằng tên B vì có quan hệ gần gũi (bộ phận–toàn thể, vật chứa–vật bị chứa...) → cụ thể hóa" },
+          { term: "Nhân hóa", def: "Gán đặc điểm, hành động của người cho sự vật → sinh động, gần gũi" },
+          { term: "Điệp ngữ", def: "Lặp lại từ/cụm từ có chủ đích → nhấn mạnh, tạo nhịp điệu, tăng cảm xúc" },
+          { term: "Liệt kê", def: "Sắp xếp nhiều từ/cụm từ cùng loại → diễn đạt đầy đủ, phong phú" },
+          { term: "Tương phản / Đối lập", def: "Đặt hai hình ảnh / ý trái chiều cạnh nhau → làm nổi bật sự khác biệt" },
+          { term: "Nói quá (Phóng đại)", def: "Phóng đại mức độ sự vật → gây ấn tượng mạnh, nhấn mạnh bản chất" },
+          { term: "Nói giảm nói tránh", def: "Diễn đạt nhẹ nhàng, tế nhị hơn → lịch sự, giảm cảm giác đau buồn" },
+          { term: "Đảo ngữ", def: "Thay đổi trật tự thông thường của câu → nhấn mạnh, tạo nhạc điệu" },
+        ]
+      },
+      {
+        title: "Biện pháp tu từ về CÂU",
+        items: [
+          { term: "Câu hỏi tu từ", def: "Câu hỏi không cần trả lời, dùng để khẳng định, nhấn mạnh hoặc gợi suy nghĩ" },
+          { term: "Lặp cú pháp", def: "Dùng lại cấu trúc câu giống nhau nhiều lần → nhịp điệu, nhấn mạnh ý" },
+          { term: "Chêm xen", def: "Thêm thành phần phụ vào câu (trong ngoặc hoặc dấu gạch ngang) → bổ sung thông tin, tăng biểu cảm" },
+          { term: "Im lặng nghệ thuật (dấu ...)", def: "Bỏ lửng câu, không nói hết → gợi sự bỏ ngỏ, cảm xúc dồn nén" },
+        ]
+      },
+      {
+        title: "Phép liên kết",
+        items: [
+          { term: "Phép lặp", def: "Lặp lại từ ngữ đã dùng ở câu/đoạn trước" },
+          { term: "Phép thế", def: "Thay từ đã dùng bằng từ đồng nghĩa, đại từ..." },
+          { term: "Phép nối", def: "Dùng từ nối: nhưng, tuy nhiên, vì vậy, do đó..." },
+          { term: "Phép liên tưởng", def: "Dùng từ cùng trường nghĩa với từ đã dùng trước" },
+        ]
+      },
+    ]
+  },
+  {
+    id: "theloai", label: "Thể Loại", icon: "📚", color: "#fb923c",
+    sections: [
+      {
+        title: "Thơ",
+        items: [
+          { term: "Thể thơ lục bát", def: "Câu 6 chữ xen câu 8 chữ, vần bằng, âm điệu tha thiết – đặc trưng dân gian" },
+          { term: "Thể thơ thất ngôn", def: "7 chữ mỗi câu, niêm luật chặt chẽ, trang trọng – ảnh hưởng Đường thi" },
+          { term: "Thơ tự do", def: "Không bị ràng buộc về số chữ, vần, nhịp – diễn đạt cảm xúc tự nhiên" },
+          { term: "Vần thơ", def: "Âm thanh lặp lại tạo nhạc điệu: vần chân, vần lưng, vần ôm, vần liên tiếp" },
+          { term: "Nhịp thơ", def: "Cách ngắt dòng, ngắt câu tạo tiết tấu → ảnh hưởng đến cảm xúc" },
+          { term: "Hình ảnh thơ", def: "Hình ảnh cụ thể mang ý nghĩa biểu tượng, thường dùng ẩn dụ, so sánh" },
+          { term: "Cái tôi trữ tình", def: "Chủ thể cảm xúc trong bài thơ – có thể là tác giả hoặc nhân vật trữ tình" },
+          { term: "Giọng điệu", def: "Sắc thái cảm xúc xuyên suốt: bi thương, hào hùng, trầm lắng, tha thiết..." },
+          { term: "Mạch cảm xúc", def: "Sự vận động của cảm xúc từ đầu đến cuối bài thơ" },
+        ]
+      },
+      {
+        title: "Truyện ngắn / Tiểu thuyết",
+        items: [
+          { term: "Tình huống truyện", def: "Hoàn cảnh đặc biệt làm bộc lộ bản chất nhân vật / chủ đề – 'hạt nhân' của truyện ngắn. 3 loại: nhận thức, tâm trạng, hành động" },
+          { term: "Ngôi kể thứ nhất", def: "Người kể xưng 'tôi', có điểm nhìn chủ quan, gần gũi, chân thực" },
+          { term: "Ngôi kể thứ ba", def: "Người kể đứng ngoài, quan sát toàn cảnh, khách quan hơn" },
+          { term: "Điểm nhìn trần thuật", def: "Góc nhìn kể chuyện: từ bên ngoài, bên trong tâm lý, hay nhiều điểm nhìn" },
+          { term: "Nhân vật", def: "Phân tích qua: ngoại hình, ngôn ngữ, hành động, tâm lý, mối quan hệ với nhân vật khác" },
+          { term: "Chi tiết nghệ thuật", def: "Chi tiết nhỏ mang ý nghĩa lớn, góp phần bộc lộ chủ đề hoặc tính cách nhân vật" },
+          { term: "Kết cấu", def: "Cách tổ chức, sắp xếp các sự kiện, tình tiết của câu chuyện" },
+          { term: "Không gian nghệ thuật", def: "Môi trường, bối cảnh xảy ra câu chuyện – mang tính biểu tượng" },
+          { term: "Thời gian nghệ thuật", def: "Thời gian trong tác phẩm: tuyến tính, đảo ngược, co giãn..." },
+        ]
+      },
+      {
+        title: "Ký (tùy bút, bút ký, hồi ký)",
+        items: [
+          { term: "Đặc trưng", def: "Viết về người thật, việc thật; kết hợp tự sự và trữ tình" },
+          { term: "Cái tôi tác giả", def: "Hiện diện trực tiếp, bộc lộ cảm xúc và suy nghĩ cá nhân rõ nét" },
+          { term: "Ngôn ngữ ký", def: "Giàu cảm xúc, liên tưởng phóng khoáng, uyên bác" },
+          { term: "Tùy bút", def: "Ghi chép tự do, theo dòng liên tưởng, đậm chất trữ tình" },
+        ]
+      },
+      {
+        title: "Văn bản nghị luận",
+        items: [
+          { term: "Luận điểm", def: "Ý kiến, quan điểm cần chứng minh – câu khẳng định rõ ràng" },
+          { term: "Luận cứ", def: "Lý lẽ và dẫn chứng dùng để chứng minh luận điểm" },
+          { term: "Thao tác giải thích", def: "Làm rõ khái niệm, ý nghĩa của vấn đề" },
+          { term: "Thao tác phân tích", def: "Chia nhỏ vấn đề, xem xét từng khía cạnh" },
+          { term: "Thao tác chứng minh", def: "Dùng dẫn chứng thực tế để làm sáng tỏ luận điểm" },
+          { term: "Thao tác bình luận", def: "Đánh giá, nhận xét, đề xuất ý kiến của người viết" },
+          { term: "Thao tác bác bỏ", def: "Phản bác ý kiến sai, quan điểm đối lập" },
+          { term: "Thao tác so sánh", def: "Đối chiếu để làm nổi bật điểm giống/khác" },
+        ]
+      },
+      {
+        title: "Văn bản thông tin",
+        items: [
+          { term: "Thông tin chính", def: "Nội dung cốt lõi văn bản muốn truyền đạt" },
+          { term: "Mục đích người viết", def: "Thông báo, thuyết phục, hướng dẫn, giải thích..." },
+          { term: "Yếu tố phi ngôn ngữ", def: "Bảng biểu, số liệu, hình ảnh, sơ đồ – hỗ trợ thông tin" },
+          { term: "Cách đọc văn bản thông tin", def: "Xác định chủ đề → tìm luận điểm chính → đánh giá độ tin cậy dữ liệu" },
+        ]
+      },
+    ]
+  },
+  {
+    id: "lyluan", label: "Lý Luận VH", icon: "💡", color: "#a78bfa",
+    sections: [
+      {
+        title: "Bản chất & chức năng văn học",
+        items: [
+          { term: "Văn học là nghệ thuật ngôn từ", def: "Chất liệu là ngôn ngữ; phản ánh hiện thực qua hình tượng, không nói thẳng" },
+          { term: "Chức năng nhận thức", def: "Giúp hiểu con người, xã hội, lịch sử sâu sắc hơn" },
+          { term: "Chức năng giáo dục", def: "Bồi dưỡng tư tưởng, đạo đức, nhân cách người đọc" },
+          { term: "Chức năng thẩm mỹ", def: "Mang lại rung cảm về cái đẹp, nâng cao cảm quan nghệ thuật" },
+          { term: "Chức năng giao tiếp", def: "Kết nối tác giả – tác phẩm – bạn đọc qua thời gian" },
+        ]
+      },
+      {
+        title: "Nội dung & Nghệ thuật",
+        items: [
+          { term: "Giá trị hiện thực", def: "Tác phẩm phản ánh trung thực cuộc sống, xã hội, con người thời đại" },
+          { term: "Giá trị nhân đạo", def: "Yêu thương, trân trọng con người; lên án cái ác; khơi dậy khát vọng sống" },
+          { term: "Hình tượng nghệ thuật", def: "Cách phản ánh hiện thực gián tiếp qua hình ảnh, biểu tượng cụ thể – sinh động" },
+          { term: "Tính biểu cảm", def: "Văn học chứa đựng cảm xúc, thái độ, quan điểm của người viết" },
+          { term: "Tính cá thể hóa", def: "Mỗi tác giả có giọng điệu, phong cách riêng không trộn lẫn" },
+        ]
+      },
+      {
+        title: "Phong cách tác giả",
+        items: [
+          { term: "Phong cách", def: "Những đặc điểm riêng, nhất quán trong nội dung và nghệ thuật qua nhiều tác phẩm" },
+          { term: "Hoàn cảnh sáng tác", def: "Bối cảnh lịch sử, xã hội, cá nhân lúc viết → ảnh hưởng đến nội dung, cảm xúc" },
+          { term: "Chủ đề tư tưởng", def: "Vấn đề trung tâm tác giả muốn đặt ra và thông điệp gửi đến người đọc" },
+        ]
+      },
+    ]
+  },
+  {
+    id: "lamvan", label: "Làm Văn", icon: "✍️", color: "#f472b6",
+    sections: [
+      {
+        title: "Cấu trúc bài nghị luận xã hội",
+        items: [
+          { term: "Mở bài", def: "Dẫn dắt (có thể từ câu danh ngôn, hiện tượng thực tế) → nêu vấn đề nghị luận" },
+          { term: "Giải thích", def: "Làm rõ nghĩa các khái niệm, từ khóa trong đề → giải thích ý nghĩa toàn bộ vấn đề" },
+          { term: "Phân tích – Chứng minh", def: "Biểu hiện cụ thể của vấn đề trong thực tế, dẫn chứng xác thực" },
+          { term: "Bàn luận mở rộng", def: "Mặt trái / phản đề / giới hạn của vấn đề → thể hiện tư duy phản biện" },
+          { term: "Bài học – Kết bài", def: "Rút ra bài học hành động cụ thể cho bản thân và xã hội" },
+        ]
+      },
+      {
+        title: "Cấu trúc bài nghị luận văn học",
+        items: [
+          { term: "Mở bài", def: "Giới thiệu thể loại / vấn đề nghị luận → dẫn vào nội dung cần phân tích" },
+          { term: "Luận điểm", def: "Mỗi luận điểm = câu chủ đề rõ ràng → dẫn chứng từ văn bản → phân tích → nâng cao" },
+          { term: "Phân tích thơ", def: "Mạch cảm xúc → hình ảnh → ngôn ngữ/nhịp/vần → tu từ → giọng điệu → giá trị" },
+          { term: "Phân tích truyện", def: "Tình huống → nhân vật → chi tiết nghệ thuật → ngôn ngữ kể → chủ đề → phong cách" },
+          { term: "Kết bài", def: "Khái quát giá trị nội dung + nghệ thuật → đóng góp của tác phẩm / tác giả" },
+        ]
+      },
+      {
+        title: "Kỹ năng diễn đạt",
+        items: [
+          { term: "Câu chủ đề", def: "Câu mở đầu mỗi đoạn, nêu rõ ý chính của đoạn đó" },
+          { term: "Từ nối", def: "Bên cạnh đó, tuy nhiên, hơn thế nữa, đặc biệt, do đó, vì vậy, không chỉ...mà còn..." },
+          { term: "Cách dẫn chứng", def: "Trích dẫn ngắn gọn, chính xác + phân tích ngay sau đó, không để dẫn chứng 'chơi vơi'" },
+          { term: "Tránh kể lại", def: "Phân tích ≠ kể lại. Mỗi ý phải có nhận xét, đánh giá của người viết" },
+          { term: "Nâng cao / Mở rộng", def: "Liên hệ tác phẩm khác, so sánh, hoặc rút ra ý nghĩa với người đọc hôm nay" },
+        ]
+      },
+      {
+        title: "Đặc thù đề thi 2026",
+        items: [
+          { term: "Ngữ liệu ngoài SGK", def: "Đề cho văn bản lạ hoàn toàn → cần kỹ năng đọc, không cần thuộc lòng tác phẩm" },
+          { term: "Dạng đề 1", def: "Đọc hiểu văn bản VĂN HỌC → Viết đoạn nghị luận văn học + Bài nghị luận xã hội" },
+          { term: "Dạng đề 2", def: "Đọc hiểu văn bản THÔNG TIN/NGHỊ LUẬN → Viết đoạn nghị luận xã hội + Bài nghị luận văn học" },
+          { term: "Câu 5 đọc hiểu", def: "Câu vận dụng – phải có ý kiến cá nhân, viết 3–5 câu, liên hệ thực tế" },
+          { term: "Tỉ lệ tư duy 4:3:3", def: "40% nhận biết – 30% thông hiểu – 30% vận dụng. Câu sau luôn khó hơn câu trước" },
+        ]
+      },
+    ]
+  },
+];
+
+// ── State ──────────────────────────────────────────────
+let activeTab = "tiengviet";
+let searchVal = "";
+let expanded = {};
+// notes: { [key]: string } — saved in localStorage
+let notes = JSON.parse(localStorage.getItem("vhNotes2026") || "{}");
+
+function saveNote(key, val) {
+  notes[key] = val;
+  localStorage.setItem("vhNotes2026", JSON.stringify(notes));
+}
+
+function totalItems() {
+  return data.reduce((a, d) => a + d.sections.reduce((b, s) => b + s.items.length, 0), 0);
+}
+
+function totalNotes() {
+  return Object.values(notes).filter(v => v && v.trim()).length;
+}
+
+// ── Render ─────────────────────────────────────────────
+function render() {
+  const activeData = data.find(d => d.id === activeTab);
+  const filteredSections = searchVal.trim()
+    ? activeData.sections.map(s => ({
+        ...s,
+        items: s.items.filter(i =>
+          i.term.toLowerCase().includes(searchVal.toLowerCase()) ||
+          i.def.toLowerCase().includes(searchVal.toLowerCase()) ||
+          (notes[`${activeData.id}__${s.title}__${s.items.indexOf(i)}`] || "").toLowerCase().includes(searchVal.toLowerCase())
+        )
+      })).filter(s => s.items.length > 0)
+    : activeData.sections;
+
+  // tabs
+  let tabsHTML = data.map(d => {
+    const count = d.sections.reduce((a, s) => a + s.items.length, 0);
+    const isActive = activeTab === d.id;
+    return `
+      <button class="tab-btn" onclick="setTab('${d.id}')"
+        style="border:2px solid ${isActive ? d.color : '#1e1e40'};background:${isActive ? d.color + '1a' : 'transparent'};color:${isActive ? d.color : '#46467a'}">
+        ${d.icon} ${d.label}
+        <span class="badge" style="background:${isActive ? d.color : '#1e1e40'};color:${isActive ? '#111' : '#46467a'}">${count}</span>
+      </button>`;
+  }).join('');
+
+  // sections
+  let sectionsHTML = "";
+  if (filteredSections.length === 0) {
+    sectionsHTML = `<div class="empty">Không tìm thấy kết quả nào</div>`;
+  } else {
+    filteredSections.forEach(section => {
+      let itemsHTML = "";
+      section.items.forEach((item, i) => {
+        const realIdx = activeData.sections.find(s => s.title === section.title)?.items.indexOf(item) ?? i;
+        const key = `${activeData.id}__${section.title}__${realIdx}`;
+        const isOpen = !!expanded[key];
+        const noteVal = notes[key] || "";
+        const hasNote = noteVal.trim().length > 0;
+        const isLast = i === section.items.length - 1;
+
+        const safeNote = noteVal.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+        itemsHTML += `
+          <div class="${isLast ? '' : 'item-divider'}">
+            <div class="item-row item-inner" onclick="toggleItem('${key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+              <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0">
+                <div class="dot" style="background:${isOpen ? activeData.color : '#30305a'}"></div>
+                <span style="font-size:13px;font-weight:${isOpen?600:500};color:${isOpen ? activeData.color : '#c0b8e0'}">${item.term}</span>
+                ${hasNote ? '<div class="has-note-dot" title="Có ghi chú"></div>' : ''}
+              </div>
+              <span class="arrow ${isOpen ? 'open' : ''}">▾</span>
+            </div>
+            ${isOpen ? `
+            <div class="item-body" onclick="event.stopPropagation()">
+              <div class="def-box">${item.def}</div>
+              <div class="note-label">📝 Ghi chú của bạn</div>
+              <textarea class="note-textarea"
+                id="note-${key.replace(/[^a-zA-Z0-9]/g,'-')}"
+                placeholder="Ghi ví dụ, cách nhớ, liên hệ thực tế..."
+                onchange="saveNoteUI('${key.replace(/'/g,"\\'")}', this.value)"
+              >${safeNote}</textarea>
+              <div class="note-saved" id="saved-${key.replace(/[^a-zA-Z0-9]/g,'-')}">✓ Đã lưu</div>
+            </div>` : ''}
+          </div>`;
+      });
+
+      sectionsHTML += `
+        <div class="section-box">
+          <div class="section-header">
+            <span style="font-size:12px;font-weight:700;color:${activeData.color}">${section.title}</span>
+            <span style="font-size:11px;color:#34345a">${section.items.length} mục</span>
+          </div>
+          ${itemsHTML}
+        </div>`;
+    });
+  }
+
+  const tn = totalNotes();
+
+  document.getElementById('app').innerHTML = `
+    <div>
+      <div style="background:linear-gradient(135deg,#111128,#181838,#0e2040);padding:26px 22px 18px;border-bottom:1px solid #1e1e40">
+        <div style="max-width:800px;margin:0 auto">
+          <p style="font-size:10px;color:#a78bfa;letter-spacing:4px;text-transform:uppercase;margin-bottom:5px">Thi THPT 2026 · Chương trình mới</p>
+          <h1 style="font-size:22px;font-weight:700;color:#f0eaff;margin-bottom:3px">Hệ thống Kiến thức Ngữ Văn</h1>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
+            <p style="color:#46467a;font-size:12px">${totalItems()} đơn vị kiến thức</p>
+            ${tn > 0 ? `<span class="notes-count">📝 ${tn} ghi chú</span>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div style="max-width:800px;margin:0 auto;padding:0 18px">
+        <div class="tabs-scroll">${tabsHTML}</div>
+        <input class="search-box" type="text" placeholder='Tìm kiến thức hoặc trong ghi chú...'
+          value="${searchVal.replace(/"/g,'&quot;')}"
+          oninput="setSearch(this.value)" />
+        <div style="padding-bottom:52px">${sectionsHTML}</div>
+      </div>
+    </div>`;
+}
+
+function setTab(id) { activeTab = id; searchVal = ""; render(); }
+function setSearch(val) { searchVal = val; render(); }
+function toggleItem(key) { expanded[key] = !expanded[key]; render(); }
+
+function saveNoteUI(key, val) {
+  saveNote(key, val);
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '-');
+  const el = document.getElementById('saved-' + safeId);
+  if (el) {
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1500);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
